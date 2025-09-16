@@ -1,0 +1,2038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logarithmic Graphs Explorer | Mathswell</title>
+    <link rel="icon" href="/logo-mathswell-square-mirror.ico" type="image/x-icon">
+    <link rel="icon" href="/logo-mathswell-square-mirror.svg" type="image/svg+xml">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #10b981;
+            --background: #f7faf9;
+            --interactive: #e6fffb;
+            --text-primary: #212121;
+            --text-muted: #4b5563;
+            --accent-amber: #f59e0b;
+            --accent-red: #c62828;
+            --success: #10b981;
+            --ai-indicator: #6366f1;
+            --ai-bg: #f0f9ff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-top: 60px;
+        }
+        
+        .mathswell-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mw-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            transition: opacity 0.2s ease;
+        }
+        
+        .mw-link:hover {
+            opacity: 0.8;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow-x: auto;
+            justify-content: center;
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: white;
+            color: var(--text-muted);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: var(--interactive);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .hero {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .hero h1 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+        
+        .concept-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .concept-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .concept-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .concept-card .icon {
+            font-size: 1.5rem;
+        }
+        
+        .demo-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .demo-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .scale-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .scale-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .scale-btn:hover:not(.active) {
+            background: var(--interactive);
+        }
+        
+        .graph-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        #introCanvas, #explorerCanvas, #challengeCanvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .insights {
+            background: var(--interactive);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            border: 1px solid var(--primary-light);
+        }
+        
+        .insights h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .insight-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .nav-btn {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        
+        .preset-pills {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .preset-pill {
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        
+        .preset-pill:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+        }
+        
+        .preset-pill.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .control-group {
+            background: var(--interactive);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--primary-light);
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        .toggle-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .toggle-btn {
+            flex: 1;
+            padding: 0.4rem;
+            border: 1px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        
+        .toggle-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .info-display {
+            background: var(--interactive);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .info-item {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .info-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-value {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .challenge-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .mystery-data {
+            background: var(--interactive);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .challenge-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .challenge-btn {
+            padding: 0.75rem;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .challenge-btn:hover {
+            background: var(--interactive);
+        }
+        
+        .challenge-btn.selected {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .feedback-area {
+            background: var(--interactive);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            min-height: 100px;
+            display: none;
+        }
+        
+        .feedback-area.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .feedback-area h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-check {
+            background: var(--primary-light);
+            color: white;
+        }
+        
+        .challenge-ai {
+            background: var(--accent-amber);
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .reasoning-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            font-size: 1rem;
+            margin: 1rem 0;
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .ai-disclosure-banner {
+            background: linear-gradient(135deg, rgba(230, 255, 251, 0.3) 0%, rgba(230, 255, 251, 0.8) 100%);
+            border: 1px solid var(--primary-light);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .ai-badge {
+            background: var(--ai-indicator);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        
+        .ai-disclosure-banner small {
+            display: block;
+            margin-top: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .ai-tab .ai-indicator {
+            font-size: 1rem;
+            color: var(--ai-indicator);
+            margin-left: 0.5rem;
+        }
+
+        /* MathPal Unique Styles */
+        .mathpal-presence {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        
+        .mathpal-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--primary) 0%, var(--primary-light) 50%, var(--interactive) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.3);
+            animation: mathpal-breathe 3s ease-in-out infinite;
+            position: relative;
+        }
+        
+        /* MathPal Character Animations */
+        .mathpal-avatar-container {
+            width: 50px;
+            height: 50px;
+            position: relative;
+            animation: mathpal-bob 3s ease-in-out infinite;
+        }
+        
+        @keyframes mathpal-bob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        
+        .robot-eye {
+            animation: robot-blink 4s infinite;
+        }
+        
+        @keyframes robot-blink {
+            0%, 90%, 100% { opacity: 1; }
+            95% { opacity: 0.1; }
+        }
+        
+        .mathpal-avatar-container svg {
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        
+        .mathpal-avatar-container:hover svg {
+            animation: mathpal-wave 0.5s ease;
+        }
+        
+        @keyframes mathpal-wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+        
+        .mathpal-thinking {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            animation: think-pulse 1s ease infinite;
+        }
+        
+        @keyframes think-pulse {
+            0%, 100% { opacity: 0.5; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+        
+        .mathpal-container {
+            background: linear-gradient(135deg, rgba(230, 255, 251, 0.5) 0%, white 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--primary-light);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mathpal-container::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--interactive) 0%, transparent 70%);
+            opacity: 0.3;
+            animation: mathpal-think-bg 4s ease-in-out infinite;
+        }
+        
+        @keyframes mathpal-think-bg {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-20px, -20px) scale(1.1); }
+        }
+        
+        .mathpal-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .mathpal-status-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .mathpal-status-text {
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        .thinking-dots {
+            display: inline-flex;
+            gap: 0.2rem;
+            margin-left: 0.5rem;
+        }
+        
+        .thinking-dots span {
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: dot-bounce 1.4s ease-in-out infinite;
+        }
+        
+        .thinking-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .thinking-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes dot-bounce {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1.2); opacity: 1; }
+        }
+        
+        .mathpal-workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .approach-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            min-height: 120px;
+            position: relative;
+        }
+        
+        .approach-card h5 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .your-approach {
+            border-top: 3px solid var(--primary);
+        }
+        
+        .pal-approach {
+            border-top: 3px solid var(--primary-light);
+            position: relative;
+        }
+        
+        .pal-approach.thinking::after {
+            content: "🤔";
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            animation: think-to-insight 2s ease forwards;
+        }
+        
+        @keyframes think-to-insight {
+            0% { content: "🤔"; opacity: 0.5; transform: rotate(0deg); }
+            50% { content: "🤔"; opacity: 1; transform: rotate(10deg); }
+            100% { content: "💡"; opacity: 1; transform: rotate(0deg); }
+        }
+        
+        .mathpal-exchange {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .exchange-btn {
+            flex: 1;
+            padding: 0.75rem;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .exchange-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .exchange-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .mathpal-message {
+            background: white;
+            border: 2px solid var(--primary-light);
+            border-radius: 18px 18px 18px 4px;
+            padding: 1rem;
+            margin: 1rem 0;
+            position: relative;
+            animation: slideInLeft 0.3s ease;
+        }
+        
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .mathpal-message::before {
+            content: "MathPal";
+            position: absolute;
+            top: -20px;
+            left: 0;
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .student-message {
+            background: var(--primary);
+            color: white;
+            border-radius: 18px 18px 4px 18px;
+            padding: 1rem;
+            margin: 1rem 0;
+            margin-left: auto;
+            max-width: 80%;
+            animation: slideInRight 0.3s ease;
+        }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .mathpal-hints {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .hint-level {
+            padding: 0.5rem;
+            background: white;
+            border: 1px solid var(--primary-light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            position: relative;
+        }
+        
+        .hint-level:hover {
+            background: var(--interactive);
+            transform: translateY(-2px);
+        }
+        
+        .hint-level.unlocked {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .hint-level .level-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .hint-level .level-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .ai-unavailable {
+            background: var(--interactive);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--accent-amber);
+        }
+
+        .ai-thinking {
+            animation: thinking 1.5s ease-in-out infinite;
+            display: block;
+            margin: 1rem 0;
+            color: var(--ai-indicator);
+            font-weight: 600;
+        }
+        
+        @keyframes thinking {
+            0%, 80%, 100% { opacity: 0.5; }
+            40% { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            
+            .concept-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .graph-container {
+                height: 300px;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mathswell-nav">
+        <a href="/" class="mw-link">
+            <img src="/logo-mathswell-square-mirror.svg" alt="Mathswell" width="28" height="28">
+            <span>MATHSWELL</span>
+        </a>
+    </div>
+    
+    <div class="container">
+        <div class="ai-disclosure-banner">
+            <div style="display: flex; align-items: center; gap: 0.75rem; justify-content: center;">
+                <svg width="32" height="32" viewBox="0 0 100 100" style="flex-shrink: 0;">
+                    <!-- MathPal Icon -->
+                    <circle cx="50" cy="50" r="45" fill="#e6fffb"/>
+                    <rect x="35" y="60" width="30" height="25" fill="#0f766e" rx="3"/>
+                    <rect x="30" y="35" width="40" height="30" fill="#10b981" rx="8"/>
+                    <line x1="50" y1="35" x2="50" y2="25" stroke="#0f766e" stroke-width="2"/>
+                    <circle cx="50" cy="23" r="3" fill="#f59e0b"/>
+                    <circle cx="40" cy="47" r="5" fill="white"/>
+                    <circle cx="60" cy="47" r="5" fill="white"/>
+                    <circle cx="40" cy="47" r="3" fill="#0f766e"/>
+                    <circle cx="60" cy="47" r="3" fill="#0f766e"/>
+                    <path d="M 40 55 Q 50 60 60 55" stroke="#0f766e" stroke-width="2" fill="none" stroke-linecap="round"/>
+                </svg>
+                <div style="text-align: left;">
+                    <div style="font-weight: 600; color: var(--primary); margin-bottom: 0.25rem;">
+                        MathPal - Your AI Study Buddy
+                    </div>
+                    <div style="font-size: 0.875rem; color: var(--text-muted);">
+                        Learns alongside you • Can make mistakes • May be occasionally unavailable
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="intro">Introduction</button>
+            <button class="tab-btn" data-tab="explorer">Explorer</button>
+            <button class="tab-btn ai-tab" data-tab="challenge">
+                Challenge with MathPal
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="vertical-align: middle; margin-left: 6px;">
+                    <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.2"/>
+                    <circle cx="8" cy="10" r="1.5" fill="currentColor"/>
+                    <circle cx="16" cy="10" r="1.5" fill="currentColor"/>
+                    <path d="M8 15C8 15 10 17 12 17C14 17 16 15 16 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div id="intro" class="tab-content active">
+            <div class="hero">
+                <h1>📊 Discover Hidden Patterns with Logarithmic Graphs</h1>
+                <p>When data spans from tiny to enormous values—like bacteria doubling from 1 to millions, or comparing earthquake magnitudes—regular graphs fail us. Logarithmic graphs reveal the hidden patterns in exponential and power relationships by transforming curves into straight lines we can understand.</p>
+            </div>
+            
+            <div class="concept-cards">
+                <div class="concept-card">
+                    <h3><span class="icon">📏</span> Linear vs Log Scale</h3>
+                    <p><strong>Linear scale:</strong> Equal steps (1, 2, 3, 4...)</p>
+                    <p><strong>Log scale:</strong> Multiplying steps (1, 10, 100, 1000...)</p>
+                    <p>Log scales compress huge ranges into readable graphs!</p>
+                </div>
+                
+                <div class="concept-card">
+                    <h3><span class="icon">📈</span> Semi-log Graphs</h3>
+                    <p><strong>What:</strong> Log scale on y-axis, linear on x-axis</p>
+                    <p><strong>Magic:</strong> Exponential growth (y = a·bˣ) becomes a straight line!</p>
+                    <p><strong>Use for:</strong> Population growth, compound interest, viral spread</p>
+                </div>
+                
+                <div class="concept-card">
+                    <h3><span class="icon">🔍</span> Log-log Graphs</h3>
+                    <p><strong>What:</strong> Log scale on both axes</p>
+                    <p><strong>Magic:</strong> Power laws (y = a·xᵇ) become straight lines!</p>
+                    <p><strong>Use for:</strong> Earthquakes, city sizes, word frequencies</p>
+                </div>
+            </div>
+            
+            <div class="demo-section">
+                <h3>🎯 Interactive Demo: See the Magic of Log Scales</h3>
+                <p style="margin-bottom: 1rem; color: var(--text-muted);">Watch how the same exponential data transforms when we change scales:</p>
+                
+                <div class="demo-controls">
+                    <button class="scale-btn active" data-scale="linear">Linear Scale</button>
+                    <button class="scale-btn" data-scale="semilog">Semi-log Scale</button>
+                    <button class="scale-btn" data-scale="loglog">Log-log Scale</button>
+                </div>
+                
+                <div class="graph-container">
+                    <canvas id="introCanvas"></canvas>
+                </div>
+                
+                <div class="info-display" style="margin-top: 1rem;">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Current Scale</div>
+                            <div class="info-value" id="currentScale">Linear</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Data Pattern</div>
+                            <div class="info-value" id="dataPattern">Exponential: y = 2ˣ</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Visual Result</div>
+                            <div class="info-value" id="visualResult">Curved line</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="insights">
+                <h3>💡 Two Ways to Think About Log Graphs</h3>
+                <div class="insight-grid">
+                    <div class="insight-item">
+                        <strong>As Pattern Detectors:</strong> They reveal whether your data follows exponential growth (straight on semi-log) or power law relationships (straight on log-log).
+                    </div>
+                    <div class="insight-item">
+                        <strong>As Range Compressors:</strong> They let you see tiny and huge values on the same graph—essential when data spans many orders of magnitude.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="switchTab('explorer')">
+                    Explore Real Data Sets →
+                </button>
+                <button class="nav-btn" onclick="switchTab('challenge')">
+                    Test Your Skills →
+                </button>
+            </div>
+        </div>
+        
+        <div id="explorer" class="tab-content">
+            <div class="hero">
+                <h2>🔬 Explore Real-World Data</h2>
+                <p>Discover how different phenomena reveal their true nature through the right graph scale.</p>
+            </div>
+            
+            <div class="demo-section">
+                <h3>Choose a Dataset</h3>
+                <div class="preset-pills">
+                    <button class="preset-pill active" data-preset="bacteria">🦠 Bacteria Growth</button>
+                    <button class="preset-pill" data-preset="earthquake">🌋 Earthquake Energy</button>
+                    <button class="preset-pill" data-preset="covid">😷 COVID Spread</button>
+                    <button class="preset-pill" data-preset="cities">🏙️ City Populations</button>
+                    <button class="preset-pill" data-preset="radioactive">☢️ Radioactive Decay</button>
+                </div>
+                
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label>Y-Axis Scale</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" data-y="linear">Linear</button>
+                            <button class="toggle-btn" data-y="log">Log</button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>X-Axis Scale</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" data-x="linear">Linear</button>
+                            <button class="toggle-btn" data-x="log">Log</button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Display Options</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" data-option="grid">Grid</button>
+                            <button class="toggle-btn" data-option="trendline">Trendline</button>
+                            <button class="toggle-btn" data-option="labels">Labels</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="graph-container">
+                    <canvas id="explorerCanvas"></canvas>
+                </div>
+                
+                <div class="info-display">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Dataset</div>
+                            <div class="info-value" id="datasetName">Bacteria Growth</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Relationship Type</div>
+                            <div class="info-value" id="relationshipType">Exponential</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Best Scale</div>
+                            <div class="info-value" id="bestScale">Semi-log</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Equation</div>
+                            <div class="info-value" id="equation">y = 100 · 2^x</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 6px;">
+                        <strong>💡 Insight:</strong>
+                        <span id="dataInsight">Bacteria double every time period. On a semi-log graph, this exponential growth appears as a straight line, making the doubling rate easy to see!</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="challenge" class="tab-content">
+            <div class="mathpal-container">
+                <div class="mathpal-status">
+                    <div class="mathpal-avatar-container">
+                        <!-- MathPal Character Avatar -->
+                        <svg width="50" height="50" viewBox="0 0 100 100" style="border-radius: 50%; background: linear-gradient(135deg, #e6fffb 0%, #10b981 100%);">
+                            <!-- Robot body -->
+                            <rect x="35" y="60" width="30" height="25" fill="#0f766e" rx="3"/>
+                            <!-- Robot head -->
+                            <rect x="30" y="35" width="40" height="30" fill="#10b981" rx="8"/>
+                            <!-- Antenna -->
+                            <line x1="50" y1="35" x2="50" y2="25" stroke="#0f766e" stroke-width="2"/>
+                            <circle cx="50" cy="23" r="3" fill="#f59e0b"/>
+                            <!-- Eyes -->
+                            <circle cx="40" cy="47" r="5" fill="white"/>
+                            <circle cx="60" cy="47" r="5" fill="white"/>
+                            <circle cx="40" cy="47" r="3" fill="#0f766e" class="robot-eye"/>
+                            <circle cx="60" cy="47" r="3" fill="#0f766e" class="robot-eye"/>
+                            <!-- Smile -->
+                            <path d="M 40 55 Q 50 60 60 55" stroke="#0f766e" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            <!-- Arms -->
+                            <rect x="25" y="65" width="8" height="15" fill="#10b981" rx="2"/>
+                            <rect x="67" y="65" width="8" height="15" fill="#10b981" rx="2"/>
+                            <!-- Books on desk -->
+                            <rect x="15" y="85" width="70" height="5" fill="#8b4513" opacity="0.3"/>
+                            <rect x="20" y="80" width="10" height="5" fill="#c62828" opacity="0.5"/>
+                            <rect x="70" y="80" width="10" height="5" fill="#1976d2" opacity="0.5"/>
+                        </svg>
+                    </div>
+                    <div class="mathpal-status-text">
+                        <strong style="color: var(--primary);">MathPal</strong> is exploring with you
+                        <span class="thinking-dots">
+                            <span></span><span></span><span></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero">
+                <h2>🎯 Pattern Detective Challenge</h2>
+                <p>Can you identify the hidden relationship in the data and choose the right graph scale?</p>
+            </div>
+            
+            <div class="challenge-section">
+                <div class="mystery-data">
+                    <h3>🔍 Mystery Dataset #<span id="challengeNumber">1</span></h3>
+                    <p id="challengeHint">This phenomenon involves something that spreads through a network...</p>
+                </div>
+                
+                <div class="graph-container" style="margin-bottom: 1.5rem;">
+                    <canvas id="challengeCanvas"></canvas>
+                </div>
+                
+                <div class="mathpal-workspace">
+                    <div class="approach-card your-approach">
+                        <h5>📝 Your Analysis</h5>
+                        <div id="your-analysis">
+                            <p style="color: #999; font-size: 0.9rem;">Select your answers below...</p>
+                        </div>
+                    </div>
+                    <div class="approach-card pal-approach" id="pal-approach">
+                        <h5>🤝 MathPal's Thinking</h5>
+                        <div id="pal-analysis">
+                            <p style="color: #999; font-size: 0.9rem;">I'm looking at the data too...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4>Step 1: What type of relationship do you see?</h4>
+                    <div class="challenge-controls">
+                        <button class="challenge-btn" data-relationship="linear">Linear</button>
+                        <button class="challenge-btn" data-relationship="exponential">Exponential</button>
+                        <button class="challenge-btn" data-relationship="power">Power Law</button>
+                        <button class="challenge-btn" data-relationship="logarithmic">Logarithmic</button>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem;">
+                    <h4>Step 2: Which graph scale would best reveal the pattern?</h4>
+                    <div class="challenge-controls">
+                        <button class="challenge-btn" data-scale-choice="linear">Linear-Linear</button>
+                        <button class="challenge-btn" data-scale-choice="semilog">Semi-log</button>
+                        <button class="challenge-btn" data-scale-choice="loglog">Log-Log</button>
+                    </div>
+                </div>
+                
+                <div class="mathpal-hints">
+                    <div class="hint-level" data-level="nudge">
+                        <div class="level-icon">💭</div>
+                        <div class="level-name">Nudge</div>
+                    </div>
+                    <div class="hint-level" data-level="pattern">
+                        <div class="level-icon">🔍</div>
+                        <div class="level-name">Pattern Hint</div>
+                    </div>
+                    <div class="hint-level" data-level="collaborate">
+                        <div class="level-icon">🤝</div>
+                        <div class="level-name">Work Together</div>
+                    </div>
+                    <div class="hint-level" data-level="reveal">
+                        <div class="level-icon">💡</div>
+                        <div class="level-name">Compare Solutions</div>
+                    </div>
+                </div>
+                
+                <div class="mathpal-exchange">
+                    <button class="exchange-btn" id="checkWorkBtn">
+                        ✓ Check My Work
+                    </button>
+                    <button class="exchange-btn" id="compareMethodsBtn">
+                        🔄 Compare Methods
+                    </button>
+                    <button class="exchange-btn" id="exploreTogetherBtn">
+                        🔬 Explore Together
+                    </button>
+                </div>
+                
+                <div id="mathpal-conversation" style="margin-top: 1.5rem;">
+                    <!-- Conversation appears here -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Track initialization state
+        let initialized = {
+            intro: false,
+            explorer: false,
+            challenge: false
+        };
+        
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.tab === tabName) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            const targetTab = document.getElementById(tabName);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+            
+            setTimeout(() => {
+                if (tabName === 'intro') {
+                    if (!initialized.intro) {
+                        initIntroDemo();
+                        initialized.intro = true;
+                    } else {
+                        drawIntroGraph();
+                    }
+                } else if (tabName === 'explorer') {
+                    if (!initialized.explorer) {
+                        initExplorer();
+                        initialized.explorer = true;
+                    } else {
+                        drawExplorerGraph();
+                    }
+                } else if (tabName === 'challenge') {
+                    if (!initialized.challenge) {
+                        initChallenge();
+                        initialized.challenge = true;
+                    }
+                    drawChallengeGraph();
+                }
+            }, 50);
+        }
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+        
+        // --- Shared Graphing Utility Functions ---
+        function getLogTicks(min, max) {
+            const ticks = [];
+            const minExp = Math.floor(Math.log10(min));
+            const maxExp = Math.ceil(Math.log10(max));
+            for (let exp = minExp; exp <= maxExp; exp++) {
+                for (let mult = 1; mult < 10; mult++) {
+                    const val = mult * Math.pow(10, exp);
+                    if (val >= min && val <= max) {
+                        ticks.push(val);
+                    }
+                }
+            }
+            return ticks;
+        }
+
+        function formatNumber(num) {
+            if (Math.abs(num) >= 1e9) return (num / 1e9).toFixed(1) + 'B';
+            if (Math.abs(num) >= 1e6) return (num / 1e6).toFixed(1) + 'M';
+            if (Math.abs(num) >= 1e3) return (num / 1e3).toFixed(1) + 'K';
+            return num.toFixed(num % 1 === 0 ? 0 : 1);
+        }
+
+        // --- Introduction Demo ---
+        let introChart = {
+            canvas: null,
+            ctx: null,
+            currentScale: 'linear',
+            data: []
+        };
+        
+        function initIntroDemo() {
+            const canvas = document.getElementById('introCanvas');
+            if (!canvas) return;
+            introChart.canvas = canvas;
+            introChart.ctx = canvas.getContext('2d');
+            introChart.data = Array.from({ length: 21 }, (_, i) => {
+                const x = i * 0.5;
+                return { x: x, y: Math.pow(2, x) };
+            });
+            if (!introChart.listenersAdded) {
+                document.querySelectorAll('.scale-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        introChart.currentScale = btn.dataset.scale;
+                        updateIntroInfo();
+                        drawIntroGraph();
+                    });
+                });
+                introChart.listenersAdded = true;
+            }
+            drawIntroGraph();
+        }
+        
+        function updateIntroInfo() {
+            const scaleText = {
+                'linear': 'Linear', 'semilog': 'Semi-log (log y-axis)', 'loglog': 'Log-log (both axes log)'
+            };
+            const resultText = {
+                'linear': 'Curved exponential line', 'semilog': 'Straight line! 📏', 'loglog': 'Curved line'
+            };
+            document.getElementById('currentScale').textContent = scaleText[introChart.currentScale];
+            document.getElementById('visualResult').textContent = resultText[introChart.currentScale];
+        }
+        
+        function drawIntroGraph() {
+            const { canvas, ctx, currentScale, data } = introChart;
+            if (!canvas) return;
+            const width = canvas.width = canvas.offsetWidth;
+            const height = canvas.height = canvas.offsetHeight;
+            ctx.clearRect(0, 0, width, height);
+            const margin = { top: 20, right: 30, bottom: 50, left: 60 };
+            const plotWidth = width - margin.left - margin.right;
+            const plotHeight = height - margin.top - margin.bottom;
+            
+            const xMin = 0, xMax = 10, yMin = 1, yMax = 1024;
+            let xScale, yScale, xTicks, yTicks;
+
+            if (currentScale === 'linear') {
+                xScale = (x) => margin.left + ((x - xMin) / (xMax - xMin)) * plotWidth;
+                yScale = (y) => height - margin.bottom - ((y - yMin) / (yMax - yMin)) * plotHeight;
+                xTicks = Array.from({ length: 11 }, (_, i) => i);
+                yTicks = [1, 200, 400, 600, 800, 1000];
+            } else if (currentScale === 'semilog') {
+                xScale = (x) => margin.left + ((x - xMin) / (xMax - xMin)) * plotWidth;
+                yScale = (y) => height - margin.bottom - ((Math.log10(y) - Math.log10(yMin)) / (Math.log10(yMax) - Math.log10(yMin))) * plotHeight;
+                xTicks = Array.from({ length: 11 }, (_, i) => i);
+                yTicks = getLogTicks(yMin, yMax);
+            } else { // loglog
+                xScale = (x) => {
+                    const xLogMin = Math.log10(Math.max(0.1, xMin));
+                    const xLogMax = Math.log10(xMax);
+                    return margin.left + ((Math.log10(Math.max(0.1, x)) - xLogMin) / (xLogMax - xLogMin)) * plotWidth;
+                };
+                yScale = (y) => height - margin.bottom - ((Math.log10(y) - Math.log10(yMin)) / (Math.log10(yMax) - Math.log10(yMin))) * plotHeight;
+                xTicks = getLogTicks(Math.max(0.1, xMin), xMax);
+                yTicks = getLogTicks(yMin, yMax);
+            }
+            
+            // Draw axes and grid
+            ctx.strokeStyle = '#999';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(margin.left, margin.top);
+            ctx.lineTo(margin.left, height - margin.bottom);
+            ctx.lineTo(width - margin.right, height - margin.bottom);
+            ctx.stroke();
+
+            ctx.strokeStyle = '#f0f0f0';
+            ctx.lineWidth = 0.5;
+            xTicks.forEach(tick => {
+                const x = xScale(tick);
+                ctx.beginPath(); ctx.moveTo(x, margin.top); ctx.lineTo(x, height - margin.bottom); ctx.stroke();
+            });
+            yTicks.forEach(tick => {
+                const y = yScale(tick);
+                ctx.beginPath(); ctx.moveTo(margin.left, y); ctx.lineTo(width - margin.right, y); ctx.stroke();
+            });
+            
+            // Draw data line
+            ctx.strokeStyle = currentScale === 'semilog' ? '#10b981' : '#0f766e';
+            ctx.lineWidth = currentScale === 'semilog' ? 3 : 2;
+            ctx.beginPath();
+            data.forEach((point, i) => {
+                const x = xScale(point.x);
+                const y = yScale(point.y);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+                ctx.fillStyle = '#0f766e';
+                ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill();
+            });
+            ctx.stroke();
+            
+            // Draw axis labels
+            ctx.fillStyle = '#666';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            xTicks.filter(t => t % (currentScale === 'linear' ? 2 : 1) === 0).forEach(tick => {
+                ctx.fillText(formatNumber(tick), xScale(tick), height - margin.bottom + 20);
+            });
+            ctx.textAlign = 'right';
+            yTicks.filter(t => t > 0 && (currentScale === 'linear' || String(t).startsWith('1'))).forEach(tick => {
+                ctx.fillText(formatNumber(tick), margin.left - 10, yScale(tick) + 4);
+            });
+            
+            ctx.fillStyle = '#333';
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Time (hours)', width / 2, height - 5);
+            ctx.save(); ctx.translate(15, height / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('Population', 0, 0); ctx.restore();
+        }
+        
+        // --- Explorer functionality ---
+        let explorerChart = {
+            canvas: null,
+            ctx: null,
+            currentDataset: 'bacteria',
+            xScale: 'linear',
+            yScale: 'linear',
+            showGrid: true,
+            showTrendline: false,
+            showLabels: false,
+            datasets: {
+                bacteria: {
+                    name: 'Bacteria Growth',
+                    type: 'exponential',
+                    equation: 'y = 100 · 2^x',
+                    bestScale: 'Semi-log',
+                    insight: 'Bacteria double every time period. On a semi-log graph, this exponential growth appears as a straight line, making the doubling rate easy to see!',
+                    data: []
+                },
+                earthquake: {
+                    name: 'Earthquake Energy',
+                    type: 'power',
+                    equation: 'y = x^2.5',
+                    bestScale: 'Log-log',
+                    insight: 'Earthquake energy follows a power law. Each magnitude increase represents ~32x more energy. Log-log graphs make these relationships linear!',
+                    data: []
+                },
+                covid: {
+                    name: 'COVID Spread (Early 2020)',
+                    type: 'exponential',
+                    equation: 'y = 50 · 1.3^x',
+                    bestScale: 'Semi-log',
+                    insight: 'Early pandemic spread was exponential. Semi-log graphs helped epidemiologists track if interventions were "flattening the curve".',
+                    data: []
+                },
+                cities: {
+                    name: 'City Populations vs Rank',
+                    type: 'power',
+                    equation: 'y = 10M / x',
+                    bestScale: 'Log-log',
+                    insight: 'City sizes follow Zipf\'s law: the 2nd largest city has ~1/2 the population of the largest, the 3rd has ~1/3, etc. Perfect for log-log graphs!',
+                    data: []
+                },
+                radioactive: {
+                    name: 'Radioactive Decay',
+                    type: 'exponential',
+                    equation: 'y = 1000 · 0.5^(x/5)',
+                    bestScale: 'Semi-log',
+                    insight: 'Radioactive materials decay exponentially with a fixed half-life. Semi-log graphs show the constant decay rate as a straight line.',
+                    data: []
+                }
+            }
+        };
+
+        function generateDataset(type) {
+            const data = [];
+            switch(type) {
+                case 'bacteria': for (let x = 0; x <= 10; x += 0.5) data.push({ x, y: 100 * Math.pow(2, x) }); break;
+                case 'earthquake': for (let x = 1; x <= 9; x += 0.5) data.push({ x, y: Math.pow(x, 2.5) * 1000 }); break;
+                case 'covid': for (let x = 0; x <= 30; x += 2) data.push({ x, y: 50 * Math.pow(1.3, x) }); break;
+                case 'cities': for (let x = 1; x <= 50; x += 2) data.push({ x, y: 10000000 / x }); break;
+                case 'radioactive': for (let x = 0; x <= 30; x += 1) data.push({ x, y: 1000 * Math.pow(0.5, x / 5) }); break;
+            }
+            return data;
+        }
+
+        function initExplorer() {
+            const canvas = document.getElementById('explorerCanvas');
+            if (!canvas) return;
+            explorerChart.canvas = canvas;
+            explorerChart.ctx = canvas.getContext('2d');
+            Object.keys(explorerChart.datasets).forEach(key => explorerChart.datasets[key].data = generateDataset(key));
+            if (!explorerChart.listenersAdded) {
+                document.querySelectorAll('.preset-pill').forEach(btn => btn.addEventListener('click', () => {
+                    document.querySelectorAll('.preset-pill').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    explorerChart.currentDataset = btn.dataset.preset;
+                    updateExplorerInfo();
+                    drawExplorerGraph();
+                }));
+                document.querySelectorAll('.toggle-btn[data-y]').forEach(btn => btn.addEventListener('click', () => {
+                    document.querySelectorAll('.toggle-btn[data-y]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    explorerChart.yScale = btn.dataset.y;
+                    drawExplorerGraph();
+                }));
+                document.querySelectorAll('.toggle-btn[data-x]').forEach(btn => btn.addEventListener('click', () => {
+                    document.querySelectorAll('.toggle-btn[data-x]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    explorerChart.xScale = btn.dataset.x;
+                    drawExplorerGraph();
+                }));
+                document.querySelectorAll('.toggle-btn[data-option]').forEach(btn => btn.addEventListener('click', () => {
+                    btn.classList.toggle('active');
+                    explorerChart[`show${btn.dataset.option.charAt(0).toUpperCase() + btn.dataset.option.slice(1)}`] = btn.classList.contains('active');
+                    drawExplorerGraph();
+                }));
+                explorerChart.listenersAdded = true;
+            }
+            updateExplorerInfo();
+            drawExplorerGraph();
+        }
+
+        function updateExplorerInfo() {
+            const dataset = explorerChart.datasets[explorerChart.currentDataset];
+            if (!dataset) return;
+            document.getElementById('datasetName').textContent = dataset.name;
+            document.getElementById('relationshipType').textContent = dataset.type.charAt(0).toUpperCase() + dataset.type.slice(1);
+            document.getElementById('bestScale').textContent = dataset.bestScale;
+            document.getElementById('equation').textContent = dataset.equation;
+            document.getElementById('dataInsight').textContent = dataset.insight;
+        }
+        
+        function drawExplorerGraph() {
+            const { canvas, ctx, currentDataset, xScale, yScale, showGrid, showTrendline, showLabels, datasets } = explorerChart;
+            if (!canvas) return;
+            const width = canvas.width = canvas.offsetWidth;
+            const height = canvas.height = canvas.offsetHeight;
+            ctx.clearRect(0, 0, width, height);
+            const margin = { top: 20, right: 30, bottom: 50, left: 70 };
+            const plotWidth = width - margin.left - margin.right;
+            const plotHeight = height - margin.top - margin.bottom;
+            
+            const dataset = datasets[currentDataset];
+            if (!dataset || !dataset.data || dataset.data.length === 0) return;
+            const data = dataset.data;
+            const xMin = Math.min(...data.map(d => d.x)), xMax = Math.max(...data.map(d => d.x));
+            const yMin = Math.min(...data.map(d => d.y)), yMax = Math.max(...data.map(d => d.y));
+            
+            let drawXScale, drawYScale, xTicks, yTicks;
+
+            if (xScale === 'linear') {
+                drawXScale = (x) => margin.left + ((x - xMin) / (xMax - xMin)) * plotWidth;
+                xTicks = Array.from({ length: 5 }, (_, i) => xMin + i * (xMax - xMin) / 4);
+            } else {
+                drawXScale = (x) => margin.left + ((Math.log10(x) - Math.log10(xMin)) / (Math.log10(xMax) - Math.log10(xMin))) * plotWidth;
+                xTicks = getLogTicks(xMin, xMax);
+            }
+
+            if (yScale === 'linear') {
+                drawYScale = (y) => height - margin.bottom - ((y - yMin) / (yMax - yMin)) * plotHeight;
+                yTicks = Array.from({ length: 5 }, (_, i) => yMin + i * (yMax - yMin) / 4);
+            } else {
+                drawYScale = (y) => height - margin.bottom - ((Math.log10(y) - Math.log10(yMin)) / (Math.log10(yMax) - Math.log10(yMin))) * plotHeight;
+                yTicks = getLogTicks(yMin, yMax);
+            }
+
+            if (showGrid) {
+                ctx.strokeStyle = '#f0f0f0';
+                ctx.lineWidth = 0.5;
+                xTicks.forEach(tick => { ctx.beginPath(); ctx.moveTo(drawXScale(tick), margin.top); ctx.lineTo(drawXScale(tick), height - margin.bottom); ctx.stroke(); });
+                yTicks.forEach(tick => { ctx.beginPath(); ctx.moveTo(margin.left, drawYScale(tick)); ctx.lineTo(width - margin.right, drawYScale(tick)); ctx.stroke(); });
+            }
+
+            ctx.strokeStyle = '#999'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(margin.left, margin.top); ctx.lineTo(margin.left, height - margin.bottom); ctx.lineTo(width - margin.right, height - margin.bottom); ctx.stroke();
+            
+            const shouldBeLinear = (dataset.type === 'exponential' && yScale === 'log' && xScale === 'linear') || (dataset.type === 'power' && yScale === 'log' && xScale === 'log');
+            ctx.strokeStyle = shouldBeLinear ? '#10b981' : '#0f766e';
+            ctx.lineWidth = shouldBeLinear ? 3 : 2;
+            ctx.beginPath();
+            data.forEach((point, i) => {
+                const x = drawXScale(point.x), y = drawYScale(point.y);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+            
+            ctx.fillStyle = '#0f766e';
+            data.forEach(point => {
+                const x = drawXScale(point.x), y = drawYScale(point.y);
+                ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+                if (showLabels && data.length <= 20) {
+                    ctx.fillStyle = '#666'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+                    ctx.fillText(`(${formatNumber(point.x)}, ${formatNumber(point.y)})`, x, y - 8);
+                    ctx.fillStyle = '#0f766e';
+                }
+            });
+
+            if (showTrendline && shouldBeLinear) {
+                ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(drawXScale(data[0].x), drawYScale(data[0].y));
+                ctx.lineTo(drawXScale(data[data.length - 1].x), drawYScale(data[data.length - 1].y));
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+            
+            ctx.fillStyle = '#666'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
+            xTicks.forEach(tick => ctx.fillText(formatNumber(tick), drawXScale(tick), height - margin.bottom + 20));
+            ctx.textAlign = 'right';
+            yTicks.forEach(tick => ctx.fillText(formatNumber(tick), margin.left - 10, drawYScale(tick) + 4));
+
+            ctx.fillStyle = '#333'; ctx.font = '14px sans-serif'; ctx.textAlign = 'center';
+            let xTitle = dataset.name && dataset.name.includes('City') ? 'City Rank' : 'Time';
+            if (dataset.name && dataset.name.includes('Earthquake')) xTitle = 'Magnitude';
+            ctx.fillText(xTitle, width / 2, height - 5);
+            ctx.save(); ctx.translate(15, height / 2); ctx.rotate(-Math.PI / 2);
+            let yTitle = 'Value';
+            if (dataset.name && dataset.name.includes('Bacteria')) yTitle = 'Population';
+            if (dataset.name && dataset.name.includes('Earthquake')) yTitle = 'Energy';
+            if (dataset.name && dataset.name.includes('COVID')) yTitle = 'Cases';
+            if (dataset.name && dataset.name.includes('City')) yTitle = 'Population';
+            if (dataset.name && dataset.name.includes('Radioactive')) yTitle = 'Activity';
+            ctx.fillText(yTitle, 0, 0); ctx.restore();
+        }
+        
+        // --- Challenge functionality with MathPal ---
+        let challengeData = {
+            currentChallenge: 0,
+            userRelationship: null,
+            userScale: null,
+            attempts: 0,
+            hintsUsed: [],
+            challenges: [
+                {
+                    hint: 'This phenomenon involves something that spreads through a network...',
+                    type: 'exponential',
+                    correctScale: 'semilog',
+                    data: [],
+                    answer: 'This is viral content spread on social media - exponential growth!',
+                    equation: 'y = 10 · 1.5^x'
+                },
+                {
+                    hint: 'This natural phenomenon follows a scaling law found throughout nature...',
+                    type: 'power',
+                    correctScale: 'loglog',
+                    data: [],
+                    answer: 'This is the relationship between animal size and metabolic rate - a power law!',
+                    equation: 'y = 50 · x^0.75'
+                },
+                {
+                    hint: 'This financial concept grows steadily over time when left alone...',
+                    type: 'exponential',
+                    correctScale: 'semilog',
+                    data: [],
+                    answer: 'This is compound interest - exponential growth of investments!',
+                    equation: 'y = 1000 · 1.07^x'
+                },
+                {
+                    hint: 'This describes how frequently different words appear in written text...',
+                    type: 'power',
+                    correctScale: 'loglog',
+                    data: [],
+                    answer: 'This is Zipf\'s law for word frequencies - a classic power law!',
+                    equation: 'y = 1000 / x'
+                },
+                {
+                    hint: 'This models how a disease spreads in the early stages of an outbreak...',
+                    type: 'exponential',
+                    correctScale: 'semilog',
+                    data: [],
+                    answer: 'This is early epidemic growth - exponential spread before interventions!',
+                    equation: 'y = 5 · 1.4^x'
+                }
+            ]
+        };
+
+        // MathPal personality and responses
+        const MathPal = {
+            hints: {
+                nudge: [
+                    "Psst... check out what happens in the middle of the graph 👀",
+                    "Something interesting happens around x=10... see it?",
+                    "The curve is trying to tell us something!"
+                ],
+                pattern: [
+                    "I noticed when x doubles, y does something special...",
+                    "Look at the spacing between points - is it consistent?",
+                    "Try imagining this on graph paper - would the gaps be equal?"
+                ],
+                collaborate: [
+                    "Let's both look at the first 5 points and the last 5 points. What's different?",
+                    "I'm seeing a pattern - are you seeing it too? Compare neighboring points!",
+                    "What if we both tried sketching this roughly? Mine curves up fast..."
+                ],
+                reveal: [
+                    "Here's what I found: when I looked at ratios between consecutive y-values...",
+                    "I tried plotting this differently and discovered something cool!",
+                    "My approach: I checked if y grows by addition or multiplication..."
+                ]
+            },
+            
+            encouragement: [
+                "Hey, we're getting somewhere!",
+                "Ooh, interesting approach!",
+                "Let's figure this out together!",
+                "I'm learning from your method too!"
+            ],
+            
+            corrections: [
+                "Hmm, I got something different. Want to compare?",
+                "Interesting! I tried another angle...",
+                "Let's both double-check - I might be wrong too!",
+                "Your method is valid, but have you considered..."
+            ]
+        };
+
+        function updateWorkspace() {
+            const yourAnalysis = document.getElementById('your-analysis');
+            const palAnalysis = document.getElementById('pal-analysis');
+            
+            if (challengeData.userRelationship || challengeData.userScale) {
+                let yourText = '<ul style="margin:0; padding-left:1.5rem; color:#333;">';
+                if (challengeData.userRelationship) {
+                    yourText += `<li>Relationship: <strong>${challengeData.userRelationship}</strong></li>`;
+                }
+                if (challengeData.userScale) {
+                    yourText += `<li>Best scale: <strong>${challengeData.userScale}</strong></li>`;
+                }
+                yourText += '</ul>';
+                yourAnalysis.innerHTML = yourText;
+                
+                // MathPal starts thinking when you make selections
+                palAnalysis.innerHTML = '<p style="color: #0f766e; font-style: italic;">Hmm, let me think about that...</p>';
+                document.getElementById('pal-approach').classList.add('thinking');
+                
+                setTimeout(() => {
+                    document.getElementById('pal-approach').classList.remove('thinking');
+                }, 2000);
+            }
+        }
+
+        function addToConversation(message, sender = 'mathpal') {
+            const conversation = document.getElementById('mathpal-conversation');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = sender === 'mathpal' ? 'mathpal-message' : 'student-message';
+            messageDiv.innerHTML = message;
+            messageDiv.style.opacity = '0';
+            conversation.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.style.opacity = '1';
+            }, 100);
+        }
+
+        function showMathPalThinking() {
+            const status = document.querySelector('.mathpal-status-text');
+            status.innerHTML = 'MathPal is thinking<span class="thinking-dots"><span></span><span></span><span></span></span>';
+        }
+
+        function hideMathPalThinking() {
+            const status = document.querySelector('.mathpal-status-text');
+            status.innerHTML = 'MathPal is exploring with you<span class="thinking-dots"><span></span><span></span><span></span></span>';
+        }
+
+        function generateChallengeData(challenge) {
+            const data = [];
+            if (challenge.type === 'exponential') {
+                const base = parseFloat(challenge.equation.split('·')[1].split('^')[0]);
+                for (let x = 0; x <= 15; x++) {
+                    data.push({ x, y: 10 * Math.pow(base, x) * (1 + (Math.random() - 0.5) * 0.05) });
+                }
+            } else { // Power Law
+                for (let x = 1; x <= 30; x++) {
+                    const powerMatch = challenge.equation.match(/x\^([\d.]+)/);
+                    const power = powerMatch ? parseFloat(powerMatch[1]) : 0.75;
+                    data.push({ x, y: 50 * Math.pow(x, power) * (1 + (Math.random() - 0.5) * 0.08) });
+                }
+            }
+            return data;
+        }
+
+        function initChallenge() {
+            if (!initialized.challenge) {
+                challengeData.currentChallenge = Math.floor(Math.random() * challengeData.challenges.length);
+            }
+            const challenge = challengeData.challenges[challengeData.currentChallenge];
+            challenge.data = generateChallengeData(challenge);
+            
+            document.getElementById('challengeNumber').textContent = challengeData.currentChallenge + 1;
+            document.getElementById('challengeHint').textContent = challenge.hint;
+            
+            // Reset UI
+            document.querySelectorAll('.challenge-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                // Add proper event listener if not already added
+                if (!btn.hasListener) {
+                    if (btn.dataset.relationship) {
+                        btn.addEventListener('click', () => {
+                            document.querySelectorAll('.challenge-btn[data-relationship]').forEach(b => b.classList.remove('selected'));
+                            btn.classList.add('selected');
+                            challengeData.userRelationship = btn.dataset.relationship;
+                            updateWorkspace();
+                        });
+                    } else if (btn.dataset.scaleChoice) {
+                        btn.addEventListener('click', () => {
+                            document.querySelectorAll('.challenge-btn[data-scale-choice]').forEach(b => b.classList.remove('selected'));
+                            btn.classList.add('selected');
+                            challengeData.userScale = btn.dataset.scaleChoice;
+                            updateWorkspace();
+                        });
+                    }
+                    btn.hasListener = true;
+                }
+            });
+            
+            // Reset MathPal hints
+            document.querySelectorAll('.hint-level').forEach(hint => {
+                hint.classList.remove('unlocked');
+                if (!hint.hasListener) {
+                    hint.addEventListener('click', () => handleHintClick(hint.dataset.level));
+                    hint.hasListener = true;
+                }
+            });
+            
+            // Setup exchange buttons
+            if (!document.getElementById('checkWorkBtn').hasListener) {
+                document.getElementById('checkWorkBtn').addEventListener('click', handleCheckWork);
+                document.getElementById('checkWorkBtn').hasListener = true;
+            }
+            if (!document.getElementById('compareMethodsBtn').hasListener) {
+                document.getElementById('compareMethodsBtn').addEventListener('click', handleCompareMethods);
+                document.getElementById('compareMethodsBtn').hasListener = true;
+            }
+            if (!document.getElementById('exploreTogetherBtn').hasListener) {
+                document.getElementById('exploreTogetherBtn').addEventListener('click', handleExploreTogether);
+                document.getElementById('exploreTogetherBtn').hasListener = true;
+            }
+            
+            challengeData.userRelationship = null;
+            challengeData.userScale = null;
+            challengeData.hintsUsed = [];
+            document.getElementById('mathpal-conversation').innerHTML = '';
+            document.getElementById('your-analysis').innerHTML = '<p style="color: #999; font-size: 0.9rem;">Select your answers below...</p>';
+            document.getElementById('pal-analysis').innerHTML = '<p style="color: #999; font-size: 0.9rem;">I\'m looking at the data too...</p>';
+            
+            drawChallengeGraph();
+        }
+        
+        function handleHintClick(level) {
+            const hintElement = document.querySelector(`.hint-level[data-level="${level}"]`);
+            if (hintElement.classList.contains('unlocked')) return;
+            
+            hintElement.classList.add('unlocked');
+            challengeData.hintsUsed.push(level);
+            
+            const hints = MathPal.hints[level];
+            const hint = hints[Math.floor(Math.random() * hints.length)];
+            
+            addToConversation(hint);
+            
+            // Update MathPal's analysis based on hint level
+            const palAnalysis = document.getElementById('pal-analysis');
+            if (level === 'reveal') {
+                const challenge = challengeData.challenges[challengeData.currentChallenge];
+                palAnalysis.innerHTML = `
+                    <p style="color: #0f766e;">I found it's <strong>${challenge.type}</strong> growth!</p>
+                    <p style="color: #666; font-size: 0.85rem;">Best viewed with <strong>${challenge.correctScale}</strong> scale</p>
+                `;
+            }
+        }
+        
+        function handleCheckWork() {
+            const challenge = challengeData.challenges[challengeData.currentChallenge];
+            const correctRelationship = challengeData.userRelationship === challenge.type;
+            const correctScale = challengeData.userScale === challenge.correctScale;
+            
+            if (!challengeData.userRelationship || !challengeData.userScale) {
+                addToConversation("Hey, make sure you've picked both a relationship and a scale first! I want to see your full solution 😊");
+                return;
+            }
+            
+            if (correctRelationship && correctScale) {
+                addToConversation(`🎉 Yes! We both got it! This is ${challenge.answer} Great pattern detection!`);
+                setTimeout(() => {
+                    addToConversation(`<button class="nav-btn" onclick="loadNewChallenge()">Next Challenge →</button>`);
+                }, 1000);
+            } else if (correctRelationship) {
+                addToConversation("Ooh, you got the relationship type right! Now, which scale would make that pattern really obvious? 🤔");
+            } else if (correctScale) {
+                addToConversation("Nice scale choice! But hmm, let's look at the actual growth pattern again...");
+            } else {
+                const encouragement = MathPal.encouragement[Math.floor(Math.random() * MathPal.encouragement.length)];
+                addToConversation(`${encouragement} Not quite what I got though. Want to try the hint buttons above?`);
+            }
+        }
+        
+        async function handleCompareMethods() {
+            if (!challengeData.userRelationship || !challengeData.userScale) {
+                addToConversation("Let's both finish our analysis first, then we can compare!");
+                return;
+            }
+            
+            showMathPalThinking();
+            const challenge = challengeData.challenges[challengeData.currentChallenge];
+            
+            const prompt = `
+You are MathPal, a friendly peer study buddy (not a teacher).
+Speak casually like a classmate: "I got...", "I tried...", "Want to see how I did it?"
+
+Student chose: ${challengeData.userRelationship} relationship, ${challengeData.userScale} scale
+Correct answer: ${challenge.type} relationship, ${challenge.correctScale} scale
+
+Compare your methods as equals. Be encouraging but honest.
+Keep it to 2-3 sentences, very conversational.
+`;
+            
+            try {
+                const response = await callAI(prompt);
+                addToConversation(response);
+            } catch (error) {
+                addToConversation("I tried " + challenge.type + " with " + challenge.correctScale + " scale. The curve straightens out perfectly that way! What made you choose your approach?");
+            } finally {
+                hideMathPalThinking();
+            }
+        }
+        
+        async function handleExploreTogether() {
+            showMathPalThinking();
+            const challenge = challengeData.challenges[challengeData.currentChallenge];
+            
+            addToConversation("Let's explore this together! I'll check the early points, you check the later ones...");
+            
+            setTimeout(() => {
+                const insight = `Looking at points 1-5, I'm seeing the y-values ${challenge.type === 'exponential' ? 'multiply' : 'follow a power pattern'}. What do you see in points 10-15?`;
+                addToConversation(insight);
+                hideMathPalThinking();
+            }, 2000);
+        }
+        
+        async function callAI(prompt) {
+            showMathPalThinking();
+            try {
+                const response = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }] })
+                });
+                if (!response.ok) throw new Error(`API error: ${response.status}`);
+                const data = await response.json();
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) throw new Error('Empty response from AI');
+                return text;
+            } catch (error) {
+                // Return a fallback MathPal response
+                const fallbacks = MathPal.corrections;
+                return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+            } finally {
+                hideMathPalThinking();
+            }
+        }
+        
+        function drawChallengeGraph() {
+            const canvas = document.getElementById('challengeCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width = canvas.offsetWidth;
+            const height = canvas.height = canvas.offsetHeight;
+            ctx.clearRect(0, 0, width, height);
+            const margin = { top: 30, right: 40, bottom: 60, left: 80 };
+            const plotWidth = width - margin.left - margin.right;
+            const plotHeight = height - margin.top - margin.bottom;
+            const data = challengeData.challenges[challengeData.currentChallenge].data;
+            if (!data || data.length === 0) { ctx.fillStyle = '#666'; ctx.font = '16px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Loading...', width / 2, height / 2); return; }
+
+            const xMin = Math.min(...data.map(d => d.x)), xMax = Math.max(...data.map(d => d.x));
+            const yMin = Math.min(...data.map(d => d.y)), yMax = Math.max(...data.map(d => d.y));
+            const xScale = (x) => margin.left + ((x - xMin) / (xMax - xMin)) * plotWidth;
+            const yScale = (y) => height - margin.bottom - ((y - yMin) / (yMax - yMin)) * plotHeight;
+            
+            ctx.fillStyle = '#fafafa'; ctx.fillRect(margin.left, margin.top, plotWidth, plotHeight);
+            ctx.strokeStyle = '#e0e0e0'; ctx.lineWidth = 1;
+            const xGridCount = 8, yGridCount = 6;
+            for (let i = 0; i <= xGridCount; i++) { const x = xScale(xMin + i * (xMax - xMin) / xGridCount); ctx.beginPath(); ctx.moveTo(x, margin.top); ctx.lineTo(x, height - margin.bottom); ctx.stroke(); }
+            for (let i = 0; i <= yGridCount; i++) { const y = yScale(yMin + i * (yMax - yMin) / yGridCount); ctx.beginPath(); ctx.moveTo(margin.left, y); ctx.lineTo(width - margin.right, y); ctx.stroke(); }
+            
+            ctx.strokeStyle = '#666'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(margin.left, margin.top); ctx.lineTo(margin.left, height - margin.bottom); ctx.lineTo(width - margin.right, height - margin.bottom); ctx.stroke();
+            
+            ctx.strokeStyle = '#0f766e'; ctx.lineWidth = 3;
+            ctx.beginPath();
+            data.forEach((point, i) => { const x = xScale(point.x), y = yScale(point.y); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); });
+            ctx.stroke();
+            data.forEach(point => { const x = xScale(point.x), y = yScale(point.y); ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#0f766e'; ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill(); });
+
+            ctx.fillStyle = '#333'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+            for (let i = 0; i <= xGridCount; i += 2) { const xVal = xMin + i * (xMax - xMin) / xGridCount; ctx.fillText(xVal.toFixed(0), xScale(xVal), height - margin.bottom + 20); }
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= yGridCount; i += 2) { const yVal = yMin + i * (yMax - yMin) / yGridCount; ctx.fillText(formatNumber(yVal), margin.left - 10, yScale(yVal) + 4); }
+            
+            ctx.fillStyle = '#666'; ctx.font = '14px sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText('X Value', width / 2, height - 10);
+            ctx.save(); ctx.translate(15, height / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('Y Value', 0, 0); ctx.restore();
+        }
+        
+        
+        function loadNewChallenge() {
+            challengeData.currentChallenge = (challengeData.currentChallenge + 1) % challengeData.challenges.length;
+            initChallenge();
+        }
+        
+        // Make loadNewChallenge globally available
+        window.loadNewChallenge = loadNewChallenge;
+        
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                switchTab('intro');
+            }, 100);
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (document.getElementById('intro').classList.contains('active')) {
+                drawIntroGraph();
+            } else if (document.getElementById('explorer').classList.contains('active')) {
+                drawExplorerGraph();
+            } else if (document.getElementById('challenge').classList.contains('active')) {
+                drawChallengeGraph();
+            }
+        });
+    </script>
+</body>
+</html>
